@@ -18,7 +18,8 @@ public class CorsConfig {
                 registry.addMapping("/**")
                 		.allowedOrigins("http://localhost:3000","https://sohel-chicken.vercel.app","https://sohel-chicken-samirs-projects-9ab2b522.vercel.app") 
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
-                        .allowedOrigins("*");
+                        .allowedOrigins("*")
+                        .allowCredentials(true);
             }
         };
     }
