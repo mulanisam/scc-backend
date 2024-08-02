@@ -19,6 +19,7 @@ import com.app.entity.Sale;
 import com.app.repository.CustomerRepository;
 import com.app.repository.DriverRepository;
 import com.app.repository.SaleRepository;
+import com.app.service.SalesService;
 
 import cutsomException.ResourceNotFoundException;
 
@@ -27,8 +28,11 @@ import cutsomException.ResourceNotFoundException;
 public class SaleController {
 
     @Autowired
+    private SalesService saleService;
+    
+    @Autowired
     private SaleRepository saleRepository;
-
+    
     @Autowired
     private CustomerRepository customerRepository;
 
@@ -52,8 +56,7 @@ public class SaleController {
     }
     @PostMapping("/bulk")
     public ResponseEntity<List<Sale>> salesBulkEntry(@RequestBody SalesBulkEntryDto salesBulkEntryDto) {
-    	List<Sale> bulkSalesEntries =SaleMapper.mapToSales(salesBulkEntryDto.getSalesDetails(), salesBulkEntryDto.getDate(), salesBulkEntryDto.getVehicleNo(), salesBulkEntryDto.getRoute(), salesBulkEntryDto.getDriver());
-    	List<Sale> result= 	saleRepository.saveAll(bulkSalesEntries);
+    	List<Sale> result = saleService.salesBulkEntry(salesBulkEntryDto);
     	return ResponseEntity.ok(result);
     }
 

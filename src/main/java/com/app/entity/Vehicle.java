@@ -24,5 +24,6 @@ public class Vehicle {
     private LocalDate passingDate;
     private LocalDate fitnessDate;
     private LocalDate PUCDate;
-    private LocalDate insuranceDate; 
+    private LocalDate insuranceDate;
+    private boolean isObsolute;
 }

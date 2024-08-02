@@ -58,9 +58,9 @@ public class UsersManagementService {
             authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
                             loginRequest.getPassword()));
-            User user = usersRepo.findByUsername(loginRequest.getUsername()).orElseThrow();
-            String jwt = jwtUtils.generateToken(user);
-            String refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
+            var user = usersRepo.findByUsername(loginRequest.getUsername()).orElseThrow();
+            var jwt = jwtUtils.generateToken(user);
+            var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
             response.setStatusCode(200);
             response.setToken(jwt);
             response.setRole(user.getRole());
@@ -86,7 +86,7 @@ public class UsersManagementService {
             String ourEmail = jwtUtils.extractUsername(refreshTokenReqiest.getToken());
             User users = usersRepo.findByUsername(ourEmail).orElseThrow();
             if (jwtUtils.isTokenValid(refreshTokenReqiest.getToken(), users)) {
-                String jwt = jwtUtils.generateToken(users);
+                var jwt = jwtUtils.generateToken(users);
                 response.setStatusCode(200);
                 response.setToken(jwt);
                 response.setRefreshToken(refreshTokenReqiest.getToken());

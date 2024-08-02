@@ -28,6 +28,7 @@ public class User implements  UserDetails {
     private String password;
     private String role;
     private String name;
+    private boolean isObsolute;
     
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

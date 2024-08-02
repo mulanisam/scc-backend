@@ -25,6 +25,8 @@ public class Customer {
     private String mobileNo;
     private String address;
     private String shopName;
+    private boolean isObsolute;
+    private double balanceAmount;
    
     
 //    @ManyToOne
