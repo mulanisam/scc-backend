@@ -19,5 +19,5 @@ public class Driver {
     private String name;
     private String mobileNo;
     private String address;
-    private boolean isObsolute;
+    private boolean obsolete;
 }

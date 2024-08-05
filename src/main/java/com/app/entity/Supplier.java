@@ -18,5 +18,5 @@ public class Supplier {
     private Long id;
     private String name;
     private String branch;
-    //private boolean isObsolute =false;
+    private boolean obsolete =false;
 }

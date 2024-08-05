@@ -29,7 +29,7 @@ public class Sale {
     private Integer pending;
     private String paymentMode;
     private String description;
-    private boolean isObsolute;
+    private boolean obsolete;
    
     @ManyToOne
     @JoinColumn(name = "route_id", nullable = false)

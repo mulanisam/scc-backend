@@ -26,7 +26,7 @@ public class City {
     private Long id;
 
     private String name;
-    private boolean isObsolute;
+    private boolean obsolete;
 
     @ManyToOne
     @JoinColumn(name = "route_id", nullable = false)

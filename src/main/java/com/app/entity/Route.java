@@ -28,7 +28,7 @@ public class Route {
     @OneToMany(mappedBy = "route")
     @JsonIgnoreProperties("route")
     private List<City> cities;
-    private boolean isObsolute;
+    private boolean obsolete;
 
 //    @OneToMany(mappedBy = "route")
 //    private List<Customer> customers;

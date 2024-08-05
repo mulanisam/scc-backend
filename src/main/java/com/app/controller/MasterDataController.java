@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.app.dto.CityDTO;
+import com.app.dto.CustomerDTO;
 import com.app.entity.City;
 import com.app.entity.Customer;
 import com.app.entity.Driver;
@@ -58,8 +60,20 @@ public class MasterDataController {
     }
 
     @PostMapping("/user/customers")
-    public Customer createCustomer(@RequestBody Customer customer) {
-        return customerRepository.save(customer);
+    public ResponseEntity<Customer> createCustomer(@RequestBody CustomerDTO customerDto) {
+    	 Customer customer = new Customer();
+    	    customer.setName(customerDto.getName());
+    	    customer.setAddress(customerDto.getAddress());
+    	    customer.setMobileNo(customerDto.getMobileNo());
+    	    customer.setShopName(customerDto.getShopName());
+    	    customer.setBalanceAmount(Double.parseDouble(customerDto.getBalanceAmount()));
+    	    customer.setObsolete(customerDto.isObsolete());
+    	    City city = cityRepository.findById(customerDto.getCity())
+    	            .orElseThrow(() -> new RuntimeException("City not found"));
+    	    customer.setCity(city);
+    	    
+    	    Customer savedCustomer = customerRepository.save(customer);
+    	    return ResponseEntity.ok(savedCustomer);
     }
 
     @GetMapping("/user/customers/{id}")
@@ -70,17 +84,23 @@ public class MasterDataController {
     }
 
     @PutMapping("/user/customers/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody Customer customerDetails) {
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id " + id));
+    public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody CustomerDTO customerDto) {
+		Customer customer = customerRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Customer not found with id " + id));
 
-        customer.setName(customerDetails.getName());
-        //customer.setRoute(customerDetails.getRoute());
-        customer.setCity(customerDetails.getCity());
-        // Update other fields as necessary
+		customer.setName(customerDto.getName());
+		customer.setAddress(customerDto.getAddress());
+		customer.setMobileNo(customerDto.getMobileNo());
+		customer.setShopName(customerDto.getShopName());
+		customer.setBalanceAmount(Double.parseDouble(customerDto.getBalanceAmount()));
+		customer.setObsolete(customerDto.isObsolete());
 
-        Customer updatedCustomer = customerRepository.save(customer);
-        return ResponseEntity.ok(updatedCustomer);
+		City city = cityRepository.findById(customerDto.getCity())
+				.orElseThrow(() -> new RuntimeException("City not found"));
+		customer.setCity(city);
+
+		Customer updatedCustomer = customerRepository.save(customer);
+		return ResponseEntity.ok(updatedCustomer);
     }
 
     @DeleteMapping("/user/customers/{id}")
@@ -124,6 +144,8 @@ public class MasterDataController {
                 .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with id " + id));
 
         supplier.setName(supplierDetails.getName());
+        supplier.setBranch(supplierDetails.getBranch());
+        supplier.setObsolete(supplierDetails.isObsolete());
         // Update other fields as necessary
 
         Supplier updatedSupplier = supplierRepository.save(supplier);
@@ -229,7 +251,13 @@ public class MasterDataController {
     }
 
     @PostMapping("/user/cities")
-    public City createCity(@RequestBody City city) {
+    public City createCity(@RequestBody CityDTO cityDto) {
+    	City city = new City();
+    	city.setName(cityDto.getName());
+    	city.setObsolete(cityDto.isObsolete());
+    	Route route = routeRepository.findById(cityDto.getRoute())
+				.orElseThrow(() -> new RuntimeException("Route not found"));
+    	city.setRoute(route);
         return cityRepository.save(city);
     }
 
@@ -241,12 +269,14 @@ public class MasterDataController {
     }
 
     @PutMapping("/user/cities/{id}")
-    public ResponseEntity<City> updateCity(@PathVariable Long id, @RequestBody City cityDetails) {
+    public ResponseEntity<City> updateCity(@PathVariable Long id, @RequestBody CityDTO cityDetails) {
         City city = cityRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("City not found with id " + id));
 
         city.setName(cityDetails.getName());
-        city.setRoute(cityDetails.getRoute());
+        Route route = routeRepository.findById(cityDetails.getRoute())
+				.orElseThrow(() -> new RuntimeException("Route not found"));
+        city.setRoute(route);
         // Update other fields as necessary
 
         City updatedCity = cityRepository.save(city);
@@ -287,8 +317,11 @@ public class MasterDataController {
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id " + id));
 
     	vehicle.setVehicleNo(vehicleDetails.getVehicleNo());
-   
-        //vehicle Update other fields as necessary
+    	vehicle.setModel(vehicleDetails.getModel());
+    	vehicle.setPassingDate(vehicleDetails.getPassingDate());
+    	vehicle.setFitnessDate(vehicleDetails.getFitnessDate());
+    	vehicle.setInsuranceDate(vehicleDetails.getInsuranceDate());
+    	vehicle.setObsolete(vehicleDetails.isObsolete());
 
     	Vehicle updatedVehicle = vehicleRepository.save(vehicle);
         return ResponseEntity.ok(updatedVehicle);

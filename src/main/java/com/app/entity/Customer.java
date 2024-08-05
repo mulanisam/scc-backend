@@ -25,7 +25,7 @@ public class Customer {
     private String mobileNo;
     private String address;
     private String shopName;
-    private boolean isObsolute;
+    private boolean obsolete;
     private double balanceAmount;
    
     
@@ -37,5 +37,6 @@ public class Customer {
     @JoinColumn(name = "city_id", nullable = false)
     @JsonIgnoreProperties("customers")
     private City city;
+
 }
 
