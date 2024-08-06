@@ -16,7 +16,7 @@ public class SalesBulkEntryDto {
 
 	//private Long id;
     private LocalDate date;
-    private Long vehicleId;
+    private Long vehicleNo;
     private Long route;
     private Long driver;
     private List<Map<String, Object>> salesDetails;

@@ -21,7 +21,7 @@ public class Sale {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDate date;
-    private Long vehicleId;
+    private Long vehicleNo;
     private Double kilograms;
     private Double rate;
     private Integer amount;

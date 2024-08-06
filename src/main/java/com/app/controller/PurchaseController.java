@@ -3,6 +3,8 @@ package com.app.controller;
 import java.io.IOException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -42,43 +44,44 @@ public class PurchaseController {
     @Autowired
     private DriverRepository driverRepository;
 
-    // Get all purchases
+    private static final Logger logger = LoggerFactory.getLogger(PurchaseController.class);
+
     @GetMapping
     public List<Purchase> getAllPurchases() {
+        logger.info("Fetching all purchases");
         return purchaseRepository.findAll();
     }
 
-    // Create a new purchase
     @PostMapping
     public ResponseEntity<String> createPurchase(@RequestParam("purchaseEntry") String purchaseJson,
             @RequestParam("files") List<MultipartFile> files) throws IOException {
         
-    	try {
-            // Deserialize JSON data
+        try {
+            logger.info("Creating purchase with JSON: {}", purchaseJson);
             ObjectMapper objectMapper = new ObjectMapper();
             PurchaseDTO purchaseDTO = objectMapper.readValue(purchaseJson, PurchaseDTO.class);
-
             
-            Purchase purchase= purchaseService.createPurchase(purchaseDTO, files);
-            return ResponseEntity.ok("Purchase Created successfully! ID-"+purchase.getId());
+            Purchase purchase = purchaseService.createPurchase(purchaseDTO, files);
+            logger.info("Purchase created successfully with ID: {}", purchase.getId());
+            return ResponseEntity.ok("Purchase Created successfully! ID-" + purchase.getId());
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to process request", e);
             return ResponseEntity.badRequest().body("Failed to process request");
         }
     }
 
-    // Get a single purchase by ID
     @GetMapping("/{id}")
     public ResponseEntity<Purchase> getPurchaseById(@PathVariable Long id) {
+        logger.info("Fetching purchase with ID: {}", id);
         Purchase purchase = purchaseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Purchase not found with id " + id));
         return ResponseEntity.ok(purchase);
     }
 
-    // Update a purchase
     @PutMapping("/{id}")
     public ResponseEntity<Purchase> updatePurchase(@PathVariable Long id, @RequestBody Purchase purchaseDetails) {
+        logger.info("Updating purchase with ID: {}", id);
         Purchase purchase = purchaseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Purchase not found with id " + id));
 
@@ -87,22 +90,20 @@ public class PurchaseController {
                 .orElseThrow(() -> new ResourceNotFoundException("Supplier not found")));
         purchase.setDriver(driverRepository.findById(purchaseDetails.getDriver().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Driver not found")));
-       // purchase.setLorryNo(purchaseDetails.getLorryNo());
-//        purchase.setKilograms(purchaseDetails.getKilograms());
-//        purchase.setRate(purchaseDetails.getRate());
-//        purchase.setAmount(purchaseDetails.getAmount());
 
         Purchase updatedPurchase = purchaseRepository.save(purchase);
+        logger.info("Purchase updated successfully with ID: {}", updatedPurchase.getId());
         return ResponseEntity.ok(updatedPurchase);
     }
 
-    // Delete a purchase
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePurchase(@PathVariable Long id) {
+        logger.info("Deleting purchase with ID: {}", id);
         Purchase purchase = purchaseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Purchase not found with id " + id));
 
         purchaseRepository.delete(purchase);
+        logger.info("Purchase deleted successfully with ID: {}", id);
         return ResponseEntity.noContent().build();
     }
 }

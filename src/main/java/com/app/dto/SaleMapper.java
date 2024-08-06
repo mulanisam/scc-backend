@@ -18,12 +18,13 @@ public class SaleMapper {
         for (Map<String, Object> salesDetail : salesDetails) {
             Sale sale = new Sale();
             sale.setDate(date);
-            sale.setVehicleId(vehicleId);
+            sale.setVehicleNo(vehicleId);
             sale.setKilograms(Double.parseDouble((String)  salesDetail.get("kilograms")));
             sale.setRate(Double.parseDouble((String)  salesDetail.get("rate")));
             sale.setAmount((Integer) salesDetail.get("amount"));
             sale.setDescription((String) salesDetail.get("description"));
-            sale.setPayment((Integer) salesDetail.get("payment"));
+            String payment = (String )salesDetail.get("payment");
+            sale.setPayment(Integer.parseInt(payment));
             sale.setPending((Integer) salesDetail.get("pending"));
             sale.setPaymentMode((String) salesDetail.get("paymentMode"));
             // Set route

@@ -2,7 +2,10 @@ package com.app.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.dto.CityDTO;
@@ -20,319 +24,294 @@ import com.app.entity.Driver;
 import com.app.entity.Route;
 import com.app.entity.Supplier;
 import com.app.entity.Vehicle;
-import com.app.repository.CityRepository;
-import com.app.repository.CustomerRepository;
-import com.app.repository.DriverRepository;
-import com.app.repository.RouteRepository;
-import com.app.repository.SupplierRepository;
-import com.app.repository.VehicleRepository;
-
-import cutsomException.ResourceNotFoundException;
+import com.app.service.MasterDataService;
 
 @RestController
-//@RequestMapping("/api/masterdata")
+@RequestMapping("/user")
 public class MasterDataController {
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private static final Logger logger = LoggerFactory.getLogger(MasterDataController.class);
 
     @Autowired
-    private SupplierRepository supplierRepository;
+    private MasterDataService masterDataService;
 
-    @Autowired
-    private DriverRepository driverRepository;
-
-    @Autowired
-    private RouteRepository routeRepository;
-
-    @Autowired
-    private CityRepository cityRepository;
-    
-    @Autowired
-    private VehicleRepository vehicleRepository;
-    
-
-    // Customer Endpoints
-
-    @GetMapping("/user/customers")
-    public List<Customer> getAllCustomers() {
-        return customerRepository.findAll();
+    @GetMapping("/customers")
+    public ResponseEntity<List<Customer>> getAllCustomers() {
+        logger.info("Entering getAllCustomers endpoint");
+        List<Customer> customers = masterDataService.getAllCustomers();
+        logger.info("Returning {} customers", customers.size());
+        logger.info("Exiting getAllCustomers endpoint");
+        return ResponseEntity.ok(customers);
     }
 
-    @PostMapping("/user/customers")
+    @PostMapping("/customers")
     public ResponseEntity<Customer> createCustomer(@RequestBody CustomerDTO customerDto) {
-    	 Customer customer = new Customer();
-    	    customer.setName(customerDto.getName());
-    	    customer.setAddress(customerDto.getAddress());
-    	    customer.setMobileNo(customerDto.getMobileNo());
-    	    customer.setShopName(customerDto.getShopName());
-    	    customer.setBalanceAmount(Double.parseDouble(customerDto.getBalanceAmount()));
-    	    customer.setObsolete(customerDto.isObsolete());
-    	    City city = cityRepository.findById(customerDto.getCity())
-    	            .orElseThrow(() -> new RuntimeException("City not found"));
-    	    customer.setCity(city);
-    	    
-    	    Customer savedCustomer = customerRepository.save(customer);
-    	    return ResponseEntity.ok(savedCustomer);
+        logger.info("Entering createCustomer endpoint with DTO: {}", customerDto);
+        Customer customer = masterDataService.createCustomer(customerDto);
+        logger.info("Created customer with ID: {}", customer.getId());
+        logger.info("Exiting createCustomer endpoint");
+        return new ResponseEntity<>(customer, HttpStatus.CREATED);
     }
 
-    @GetMapping("/user/customers/{id}")
+    @GetMapping("/customers/{id}")
     public ResponseEntity<Customer> getCustomerById(@PathVariable Long id) {
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id " + id));
+        logger.info("Entering getCustomerById endpoint with ID: {}", id);
+        Customer customer = masterDataService.getCustomerById(id);
+        logger.info("Returning customer with ID: {}", id);
+        logger.info("Exiting getCustomerById endpoint");
         return ResponseEntity.ok(customer);
     }
 
-    @PutMapping("/user/customers/{id}")
+    @PutMapping("/customers/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody CustomerDTO customerDto) {
-		Customer customer = customerRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Customer not found with id " + id));
-
-		customer.setName(customerDto.getName());
-		customer.setAddress(customerDto.getAddress());
-		customer.setMobileNo(customerDto.getMobileNo());
-		customer.setShopName(customerDto.getShopName());
-		customer.setBalanceAmount(Double.parseDouble(customerDto.getBalanceAmount()));
-		customer.setObsolete(customerDto.isObsolete());
-
-		City city = cityRepository.findById(customerDto.getCity())
-				.orElseThrow(() -> new RuntimeException("City not found"));
-		customer.setCity(city);
-
-		Customer updatedCustomer = customerRepository.save(customer);
-		return ResponseEntity.ok(updatedCustomer);
+        logger.info("Entering updateCustomer endpoint with ID: {} and DTO: {}", id, customerDto);
+        Customer customer = masterDataService.updateCustomer(id, customerDto);
+        logger.info("Updated customer with ID: {}", id);
+        logger.info("Exiting updateCustomer endpoint");
+        return ResponseEntity.ok(customer);
     }
 
-    @DeleteMapping("/user/customers/{id}")
+    @DeleteMapping("/customers/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id " + id));
-
-        customerRepository.delete(customer);
+        logger.info("Entering deleteCustomer endpoint with ID: {}", id);
+        masterDataService.deleteCustomer(id);
+        logger.info("Deleted customer with ID: {}", id);
+        logger.info("Exiting deleteCustomer endpoint");
         return ResponseEntity.noContent().build();
     }
-    @GetMapping("/user/customers/byRoute/{routeId}")
-    public List<Customer> getCustomersByRoute(@PathVariable Long routeId) {
-    	List<Customer> customerList = customerRepository.findByRouteId(routeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customers not found with Route id " + routeId));
-        return customerList;
+
+    @GetMapping("/customers/byRoute/{routeId}")
+    public ResponseEntity<List<Customer>> getCustomersByRoute(@PathVariable Long routeId) {
+        logger.info("Entering getCustomersByRoute endpoint with Route ID: {}", routeId);
+        List<Customer> customers = masterDataService.getCustomersByRoute(routeId);
+        logger.info("Returning {} customers for Route ID: {}", customers.size(), routeId);
+        logger.info("Exiting getCustomersByRoute endpoint");
+        return ResponseEntity.ok(customers);
     }
 
-
-    // Supplier Endpoints
-
-    @GetMapping("/user/suppliers")
-    public List<Supplier> getAllSuppliers() {
-        return supplierRepository.findAll();
+    @GetMapping("/suppliers")
+    public ResponseEntity<List<Supplier>> getAllSupplier() {
+        logger.info("Entering getAllSupplier endpoint");
+        List<Supplier> suppliers = masterDataService.getAllSuppliers();
+        logger.info("Returning {} suppliers", suppliers.size());
+        logger.info("Exiting getAllSupplier endpoint");
+        return ResponseEntity.ok(suppliers);
+    }
+    
+    @PostMapping("/suppliers")
+    public ResponseEntity<Supplier> createSupplier(@RequestBody Supplier supplier) {
+        logger.info("Entering createSupplier endpoint with Supplier: {}", supplier);
+        Supplier createdSupplier = masterDataService.createSupplier(supplier);
+        logger.info("Created supplier with ID: {}", createdSupplier.getId());
+        logger.info("Exiting createSupplier endpoint");
+        return new ResponseEntity<>(createdSupplier, HttpStatus.CREATED);
     }
 
-    @PostMapping("/user/suppliers")
-    public Supplier createSupplier(@RequestBody Supplier supplier) {
-        return supplierRepository.save(supplier);
-    }
-
-    @GetMapping("/user/suppliers/{id}")
+    @GetMapping("/suppliers/{id}")
     public ResponseEntity<Supplier> getSupplierById(@PathVariable Long id) {
-        Supplier supplier = supplierRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with id " + id));
+        logger.info("Entering getSupplierById endpoint with ID: {}", id);
+        Supplier supplier = masterDataService.getSupplierById(id);
+        logger.info("Returning supplier with ID: {}", id);
+        logger.info("Exiting getSupplierById endpoint");
         return ResponseEntity.ok(supplier);
     }
 
-    @PutMapping("/user/suppliers/{id}")
-    public ResponseEntity<Supplier> updateSupplier(@PathVariable Long id, @RequestBody Supplier supplierDetails) {
-        Supplier supplier = supplierRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with id " + id));
-
-        supplier.setName(supplierDetails.getName());
-        supplier.setBranch(supplierDetails.getBranch());
-        supplier.setObsolete(supplierDetails.isObsolete());
-        // Update other fields as necessary
-
-        Supplier updatedSupplier = supplierRepository.save(supplier);
+    @PutMapping("/suppliers/{id}")
+    public ResponseEntity<Supplier> updateSupplier(@PathVariable Long id, @RequestBody Supplier supplier) {
+        logger.info("Entering updateSupplier endpoint with ID: {} and Supplier: {}", id, supplier);
+        Supplier updatedSupplier = masterDataService.updateSupplier(id, supplier);
+        logger.info("Updated supplier with ID: {}", updatedSupplier.getId());
+        logger.info("Exiting updateSupplier endpoint");
         return ResponseEntity.ok(updatedSupplier);
     }
 
-    @DeleteMapping("/user/suppliers/{id}")
+    @DeleteMapping("/suppliers/{id}")
     public ResponseEntity<Void> deleteSupplier(@PathVariable Long id) {
-        Supplier supplier = supplierRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with id " + id));
-
-        supplierRepository.delete(supplier);
+        logger.info("Entering deleteSupplier endpoint with ID: {}", id);
+        masterDataService.deleteSupplier(id);
+        logger.info("Deleted supplier with ID: {}", id);
+        logger.info("Exiting deleteSupplier endpoint");
         return ResponseEntity.noContent().build();
     }
 
-    // Driver Endpoints
-
-    @GetMapping("/user/drivers")
-    public List<Driver> getAllDrivers() {
-        return driverRepository.findAll();
+    @GetMapping("/drivers")
+    public ResponseEntity<List<Driver>> getAllDrivers() {
+        logger.info("Entering getAllDrivers endpoint");
+        List<Driver> drivers = masterDataService.getAllDrivers();
+        logger.info("Returning {} drivers", drivers.size());
+        logger.info("Exiting getAllDrivers endpoint");
+        return ResponseEntity.ok(drivers);
     }
 
-    @PostMapping("/user/drivers")
-    public Driver createDriver(@RequestBody Driver driver) {
-        return driverRepository.save(driver);
+    @PostMapping("/drivers")
+    public ResponseEntity<Driver> createDriver(@RequestBody Driver driver) {
+        logger.info("Entering createDriver endpoint with Driver: {}", driver);
+        Driver createdDriver = masterDataService.createDriver(driver);
+        logger.info("Created driver with ID: {}", createdDriver.getId());
+        logger.info("Exiting createDriver endpoint");
+        return new ResponseEntity<>(createdDriver, HttpStatus.CREATED);
     }
 
-    @GetMapping("/user/drivers/{id}")
+    @GetMapping("/drivers/{id}")
     public ResponseEntity<Driver> getDriverById(@PathVariable Long id) {
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Driver not found with id " + id));
+        logger.info("Entering getDriverById endpoint with ID: {}", id);
+        Driver driver = masterDataService.getDriverById(id);
+        logger.info("Returning driver with ID: {}", id);
+        logger.info("Exiting getDriverById endpoint");
         return ResponseEntity.ok(driver);
     }
 
-    @PutMapping("/user/drivers/{id}")
-    public ResponseEntity<Driver> updateDriver(@PathVariable Long id, @RequestBody Driver driverDetails) {
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Driver not found with id " + id));
-
-        driver.setName(driverDetails.getName());
-        driver.setMobileNo(driverDetails.getMobileNo());
-        driver.setAddress(driverDetails.getAddress());
-        // Update other fields as necessary
-
-        Driver updatedDriver = driverRepository.save(driver);
+    @PutMapping("/drivers/{id}")
+    public ResponseEntity<Driver> updateDriver(@PathVariable Long id, @RequestBody Driver driver) {
+        logger.info("Entering updateDriver endpoint with ID: {} and Driver: {}", id, driver);
+        Driver updatedDriver = masterDataService.updateDriver(id, driver);
+        logger.info("Updated driver with ID: {}", updatedDriver.getId());
+        logger.info("Exiting updateDriver endpoint");
         return ResponseEntity.ok(updatedDriver);
     }
 
-    @DeleteMapping("/user/drivers/{id}")
+    @DeleteMapping("/drivers/{id}")
     public ResponseEntity<Void> deleteDriver(@PathVariable Long id) {
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Driver not found with id " + id));
-
-        driverRepository.delete(driver);
+        logger.info("Entering deleteDriver endpoint with ID: {}", id);
+        masterDataService.deleteDriver(id);
+        logger.info("Deleted driver with ID: {}", id);
+        logger.info("Exiting deleteDriver endpoint");
         return ResponseEntity.noContent().build();
     }
 
-    // Route Endpoints
-
-    @GetMapping("/user/routes")
-    public List<Route> getAllRoutes() {
-        return routeRepository.findAll();
+    @GetMapping("/routes")
+    public ResponseEntity<List<Route>> getAllRoutes() {
+        logger.info("Entering getAllRoutes endpoint");
+        List<Route> routes = masterDataService.getAllRoutes();
+        logger.info("Returning {} routes", routes.size());
+        logger.info("Exiting getAllRoutes endpoint");
+        return ResponseEntity.ok(routes);
     }
 
-    @PostMapping("/user/routes")
-    public Route createRoute(@RequestBody Route route) {
-        return routeRepository.save(route);
+    @PostMapping("/routes")
+    public ResponseEntity<Route> createRoute(@RequestBody Route route) {
+        logger.info("Entering createRoute endpoint with Route: {}", route);
+        Route createdRoute = masterDataService.createRoute(route);
+        logger.info("Created route with ID: {}", createdRoute.getId());
+        logger.info("Exiting createRoute endpoint");
+        return new ResponseEntity<>(createdRoute, HttpStatus.CREATED);
     }
 
-    @GetMapping("/user/routes/{id}")
+    @GetMapping("/routes/{id}")
     public ResponseEntity<Route> getRouteById(@PathVariable Long id) {
-        Route route = routeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Route not found with id " + id));
+        logger.info("Entering getRouteById endpoint with ID: {}", id);
+        Route route = masterDataService.getRouteById(id);
+        logger.info("Returning route with ID: {}", id);
+        logger.info("Exiting getRouteById endpoint");
         return ResponseEntity.ok(route);
     }
 
-    @PutMapping("/user/routes/{id}")
-    public ResponseEntity<Route> updateRoute(@PathVariable Long id, @RequestBody Route routeDetails) {
-        Route route = routeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Route not found with id " + id));
-
-        route.setName(routeDetails.getName());
-        // Update other fields as necessary
-
-        Route updatedRoute = routeRepository.save(route);
+    @PutMapping("/routes/{id}")
+    public ResponseEntity<Route> updateRoute(@PathVariable Long id, @RequestBody Route route) {
+        logger.info("Entering updateRoute endpoint with ID: {} and Route: {}", id, route);
+        Route updatedRoute = masterDataService.updateRoute(id, route);
+        logger.info("Updated route with ID: {}", updatedRoute.getId());
+        logger.info("Exiting updateRoute endpoint");
         return ResponseEntity.ok(updatedRoute);
     }
 
-    @DeleteMapping("/user/routes/{id}")
+    @DeleteMapping("/routes/{id}")
     public ResponseEntity<Void> deleteRoute(@PathVariable Long id) {
-        Route route = routeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Route not found with id " + id));
-
-        routeRepository.delete(route);
+        logger.info("Entering deleteRoute endpoint with ID: {}", id);
+        masterDataService.deleteRoute(id);
+        logger.info("Deleted route with ID: {}", id);
+        logger.info("Exiting deleteRoute endpoint");
         return ResponseEntity.noContent().build();
     }
 
-    // City Endpoints
-
-    @GetMapping("/user/cities")
-    public List<City> getAllCities() {
-        return cityRepository.findAll();
+    @GetMapping("/cities")
+    public ResponseEntity<List<City>> getAllCities() {
+        logger.info("Entering getAllCities endpoint");
+        List<City> cities = masterDataService.getAllCities();
+        logger.info("Returning {} cities", cities.size());
+        logger.info("Exiting getAllCities endpoint");
+        return ResponseEntity.ok(cities);
     }
 
-    @PostMapping("/user/cities")
-    public City createCity(@RequestBody CityDTO cityDto) {
-    	City city = new City();
-    	city.setName(cityDto.getName());
-    	city.setObsolete(cityDto.isObsolete());
-    	Route route = routeRepository.findById(cityDto.getRoute())
-				.orElseThrow(() -> new RuntimeException("Route not found"));
-    	city.setRoute(route);
-        return cityRepository.save(city);
+    @PostMapping("/cities")
+    public ResponseEntity<City> createCity(@RequestBody CityDTO cityDto) {
+        logger.info("Entering createCity endpoint with DTO: {}", cityDto);
+        City createdCity = masterDataService.createCity(cityDto);
+        logger.info("Created city with ID: {}", createdCity.getId());
+        logger.info("Exiting createCity endpoint");
+        return new ResponseEntity<>(createdCity, HttpStatus.CREATED);
     }
 
-    @GetMapping("/user/cities/{id}")
+    @GetMapping("/cities/{id}")
     public ResponseEntity<City> getCityById(@PathVariable Long id) {
-        City city = cityRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("City not found with id " + id));
+        logger.info("Entering getCityById endpoint with ID: {}", id);
+        City city = masterDataService.getCityById(id);
+        logger.info("Returning city with ID: {}", id);
+        logger.info("Exiting getCityById endpoint");
         return ResponseEntity.ok(city);
     }
 
-    @PutMapping("/user/cities/{id}")
-    public ResponseEntity<City> updateCity(@PathVariable Long id, @RequestBody CityDTO cityDetails) {
-        City city = cityRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("City not found with id " + id));
-
-        city.setName(cityDetails.getName());
-        Route route = routeRepository.findById(cityDetails.getRoute())
-				.orElseThrow(() -> new RuntimeException("Route not found"));
-        city.setRoute(route);
-        // Update other fields as necessary
-
-        City updatedCity = cityRepository.save(city);
+    @PutMapping("/cities/{id}")
+    public ResponseEntity<City> updateCity(@PathVariable Long id, @RequestBody CityDTO cityDto) {
+        logger.info("Entering updateCity endpoint with ID: {} and DTO: {}", id, cityDto);
+        City updatedCity = masterDataService.updateCity(id, cityDto);
+        logger.info("Updated city with ID: {}", updatedCity.getId());
+        logger.info("Exiting updateCity endpoint");
         return ResponseEntity.ok(updatedCity);
     }
 
-    @DeleteMapping("/user/cities/{id}")
+    @DeleteMapping("/cities/{id}")
     public ResponseEntity<Void> deleteCity(@PathVariable Long id) {
-        City city = cityRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("City not found with id " + id));
-
-        cityRepository.delete(city);
+        logger.info("Entering deleteCity endpoint with ID: {}", id);
+        masterDataService.deleteCity(id);
+        logger.info("Deleted city with ID: {}", id);
+        logger.info("Exiting deleteCity endpoint");
         return ResponseEntity.noContent().build();
     }
-    
-    // vehicle end points
-    
-    @GetMapping("/user/vehicles")
-    public List<Vehicle> getAllVehicles() {
-        return vehicleRepository.findAll();
+
+    @GetMapping("/vehicles")
+    public ResponseEntity<List<Vehicle>> getAllVehicles() {
+        logger.info("Entering getAllVehicles endpoint");
+        List<Vehicle> vehicles = masterDataService.getAllVehicles();
+        logger.info("Returning {} vehicles", vehicles.size());
+        logger.info("Exiting getAllVehicles endpoint");
+        return ResponseEntity.ok(vehicles);
     }
 
-    @PostMapping("/user/vehicles")
-    public Vehicle createVehicle(@RequestBody Vehicle vehicle) {
-        return vehicleRepository.save(vehicle);
+    @PostMapping("/vehicles")
+    public ResponseEntity<Vehicle> createVehicle(@RequestBody Vehicle vehicle) {
+        logger.info("Entering createVehicle endpoint with Vehicle: {}", vehicle);
+        Vehicle createdVehicle = masterDataService.createVehicle(vehicle);
+        logger.info("Created vehicle with ID: {}", createdVehicle.getId());
+        logger.info("Exiting createVehicle endpoint");
+        return new ResponseEntity<>(createdVehicle, HttpStatus.CREATED);
     }
 
-    @GetMapping("/user/vehicles/{id}")
+    @GetMapping("/vehicles/{id}")
     public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long id) {
-    	Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("vehicle not found with id " + id));
+        logger.info("Entering getVehicleById endpoint with ID: {}", id);
+        Vehicle vehicle = masterDataService.getVehicleById(id);
+        logger.info("Returning vehicle with ID: {}", id);
+        logger.info("Exiting getVehicleById endpoint");
         return ResponseEntity.ok(vehicle);
     }
 
-    @PutMapping("/user/vehicles/{id}")
-    public ResponseEntity<Vehicle> updateVehicle(@PathVariable Long id, @RequestBody Vehicle vehicleDetails) {
-    	Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id " + id));
-
-    	vehicle.setVehicleNo(vehicleDetails.getVehicleNo());
-    	vehicle.setModel(vehicleDetails.getModel());
-    	vehicle.setPassingDate(vehicleDetails.getPassingDate());
-    	vehicle.setFitnessDate(vehicleDetails.getFitnessDate());
-    	vehicle.setInsuranceDate(vehicleDetails.getInsuranceDate());
-    	vehicle.setObsolete(vehicleDetails.isObsolete());
-
-    	Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+    @PutMapping("/vehicles/{id}")
+    public ResponseEntity<Vehicle> updateVehicle(@PathVariable Long id, @RequestBody Vehicle vehicle) {
+        logger.info("Entering updateVehicle endpoint with ID: {} and Vehicle: {}", id, vehicle);
+        Vehicle updatedVehicle = masterDataService.updateVehicle(id, vehicle);
+        logger.info("Updated vehicle with ID: {}", updatedVehicle.getId());
+        logger.info("Exiting updateVehicle endpoint");
         return ResponseEntity.ok(updatedVehicle);
     }
 
-    @DeleteMapping("/user/vehicles/{id}")
+    @DeleteMapping("/vehicles/{id}")
     public ResponseEntity<Void> deleteVehicle(@PathVariable Long id) {
-        Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id " + id));
-
-        vehicleRepository.delete(vehicle);
+        logger.info("Entering deleteVehicle endpoint with ID: {}", id);
+        masterDataService.deleteVehicle(id);
+        logger.info("Deleted vehicle with ID: {}", id);
+        logger.info("Exiting deleteVehicle endpoint");
         return ResponseEntity.noContent().build();
     }
+
 }
