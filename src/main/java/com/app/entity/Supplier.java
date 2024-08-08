@@ -18,5 +18,6 @@ public class Supplier {
     private Long id;
     private String name;
     private String branch;
+    private Double pendingPayment;
     private boolean obsolete =false;
 }

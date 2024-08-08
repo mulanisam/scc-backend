@@ -149,6 +149,7 @@ public class MasterDataServiceImpl implements MasterDataService {
         supplier.setName(supplierDetails.getName());
         supplier.setBranch(supplierDetails.getBranch());
         supplier.setObsolete(supplierDetails.isObsolete());
+        supplier.setPendingPayment(supplierDetails.getPendingPayment());
         // Update other fields as necessary
         Supplier updatedSupplier = supplierRepository.save(supplier);
         logger.info("Updated supplier with ID: {}", updatedSupplier.getId());

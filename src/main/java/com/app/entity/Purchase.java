@@ -35,6 +35,8 @@ public class Purchase {
     private String diesel;
     private String hamali;
     private String notes;
+    private Double totalAmount;
+    private Double paidAmount; 
 
     @ManyToOne
     @JoinColumn(name = "vehicle_id")

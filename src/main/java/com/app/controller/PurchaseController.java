@@ -19,9 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.app.dto.PurchaseDTO;
+import com.app.dto.PurchaseDetailsDTO;
+import com.app.dto.PurchasePaymentDTO;
 import com.app.entity.Purchase;
+import com.app.entity.SupplierPaymentHist;
 import com.app.repository.DriverRepository;
 import com.app.repository.PurchaseRepository;
+import com.app.repository.SupplierPayHistRepository;
 import com.app.repository.SupplierRepository;
 import com.app.service.PurchaseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,6 +47,7 @@ public class PurchaseController {
 
     @Autowired
     private DriverRepository driverRepository;
+    
 
     private static final Logger logger = LoggerFactory.getLogger(PurchaseController.class);
 
@@ -105,5 +110,25 @@ public class PurchaseController {
         purchaseRepository.delete(purchase);
         logger.info("Purchase deleted successfully with ID: {}", id);
         return ResponseEntity.noContent().build();
+    }
+    
+    @GetMapping("/getDetails")
+    public PurchaseDetailsDTO getPurchaseDetails(@RequestParam Long supplierId, @RequestParam String entryDate) {
+        return purchaseService.getPurchaseDetails(supplierId, entryDate);
+    }
+    
+    @PostMapping("/payment")
+    public ResponseEntity<String> purchasePayment(@RequestBody PurchasePaymentDTO  paymentHistDto) throws IOException {
+        
+        try {
+            logger.info("Creating purchase Payment SupplierPaymentHist: {}", paymentHistDto); 
+            SupplierPaymentHist paymentHistSaved=purchaseService.savePurchasePayment(paymentHistDto);
+            
+            return ResponseEntity.ok("Purchase Payment Created successfully! ID-" + paymentHistSaved.getId());
+
+        } catch (Exception e) {
+            logger.error("Failed to process request", e);
+            return ResponseEntity.badRequest().body("Failed to process request");
+        }
     }
 }
