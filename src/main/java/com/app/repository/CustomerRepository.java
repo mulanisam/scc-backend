@@ -11,7 +11,10 @@ import org.springframework.data.repository.query.Param;
 import com.app.entity.Customer;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
-	@Query("SELECT cust FROM Customer cust JOIN cust.city c WHERE c.route.id = :routeId")
+	
+	@Query("SELECT cust FROM Customer cust " +
+		       "JOIN cust.city c " +
+		       "WHERE c.route.id = :routeId")
 	Optional<List<Customer>> findByRouteId(@Param("routeId") Long routId);
 	
 	@Modifying

@@ -1,9 +1,11 @@
 package com.app.controller;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,10 +14,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.app.dto.SalesBulkEntryDto;
 import com.app.entity.Sale;
+import com.app.entity.SaleDetails;
 import com.app.repository.CustomerRepository;
 import com.app.repository.DriverRepository;
 import com.app.repository.SaleRepository;
@@ -40,6 +45,7 @@ public class SaleController {
 
     @Autowired
     private DriverRepository driverRepository;
+    
 
     @GetMapping
     public ResponseEntity<List<Sale>> getAllSales() {
@@ -148,6 +154,36 @@ public class SaleController {
         } catch (Exception e) {
             logger.error("Error deleting sale with ID {}: {}", id, e.getMessage(), e);
             return ResponseEntity.status(500).build();
+        }
+    }
+    
+    @PostMapping("/saveDetails")
+    public ResponseEntity<SaleDetails> createSaleDetails(@RequestBody SaleDetails saleDetails) {
+        try {
+            SaleDetails savedSaleDetails = saleService.saveSaleDetails(saleDetails);
+            return ResponseEntity.ok(savedSaleDetails);
+        } catch (Exception e) {
+            logger.error("Error creating sale details", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error creating sale details", e);
+        }
+    }
+    @GetMapping("/saleDetails")
+    public ResponseEntity<?> getSaleDetails(
+            @RequestParam("date") LocalDate date,
+            @RequestParam("route") String route,
+            @RequestParam("vehicle") String vehicle,
+            @RequestParam("driver") String driver) {
+        
+        try {
+            logger.info("Request received for sale details with date: {}, route: {}, vehicle: {}, driver: {}", date, route, vehicle, driver);
+            SaleDetails saleDetails = saleService.getSaleDetails(date, route, vehicle, driver);
+            return new ResponseEntity<>(saleDetails, HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            logger.error("Error fetching sale details: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            logger.error("Unexpected error: {}", e.getMessage());
+            return new ResponseEntity<>("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

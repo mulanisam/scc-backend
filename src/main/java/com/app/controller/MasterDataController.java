@@ -84,7 +84,7 @@ public class MasterDataController {
     public ResponseEntity<List<Customer>> getCustomersByRoute(@PathVariable Long routeId) {
         logger.info("Entering getCustomersByRoute endpoint with Route ID: {}", routeId);
         List<Customer> customers = masterDataService.getCustomersByRoute(routeId);
-        logger.info("Returning {} customers for Route ID: {}", customers.size(), routeId);
+        logger.info("Returning {} customers for Route ID: {}", customers.get(0).getBalanceAmount(), routeId);
         logger.info("Exiting getCustomersByRoute endpoint");
         return ResponseEntity.ok(customers);
     }

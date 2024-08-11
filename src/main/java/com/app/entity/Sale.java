@@ -24,6 +24,7 @@ public class Sale {
     private Long vehicleNo;
     private Double kilograms;
     private Double rate;
+    private Integer birds;
     private Integer amount;
     private Integer payment;
     private Integer pending;

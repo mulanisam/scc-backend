@@ -27,6 +27,8 @@ public class SaleMapper {
             sale.setPayment(Integer.parseInt(payment));
             sale.setPending((Integer) salesDetail.get("pending"));
             sale.setPaymentMode((String) salesDetail.get("paymentMode"));
+            String birds = (String )salesDetail.get("birds");
+            sale.setBirds(Integer.parseInt(birds));
             // Set route
             Route route = new Route();
             route.setId(routeId);
