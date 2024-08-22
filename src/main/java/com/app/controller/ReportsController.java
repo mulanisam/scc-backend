@@ -14,7 +14,7 @@ import com.app.dto.ReportResponseDTO;
 import com.app.service.ReportService;
 
 @RestController
-@RequestMapping("/api/reports")
+@RequestMapping("/reports")
 public class ReportsController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReportsController.class);

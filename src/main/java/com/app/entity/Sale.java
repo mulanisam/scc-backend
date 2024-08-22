@@ -2,6 +2,8 @@ package com.app.entity;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -43,5 +45,10 @@ public class Sale {
     @ManyToOne
     @JoinColumn(name = "driver_id", nullable = false)
     private Driver driver;
+    
+    @ManyToOne
+    @JoinColumn(name = "sale_details_id")
+    @JsonBackReference
+    private SaleDetails saleDetails;
 
 }

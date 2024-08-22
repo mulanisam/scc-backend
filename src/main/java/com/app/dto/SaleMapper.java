@@ -9,10 +9,11 @@ import com.app.entity.Customer;
 import com.app.entity.Driver;
 import com.app.entity.Route;
 import com.app.entity.Sale;
+import com.app.entity.SaleDetails;
 
 public class SaleMapper {
 
-    public static List<Sale> mapToSales(List<Map<String, Object>> salesDetails, LocalDate date, Long vehicleId, Long routeId,Long driverId) {
+    public static List<Sale> mapToSales(List<Map<String, Object>> salesDetails, LocalDate date, Long vehicleId, Long routeId,Long driverId,SaleDetails saleDetailData) {
         List<Sale> sales = new ArrayList<>();
         
         for (Map<String, Object> salesDetail : salesDetails) {
@@ -39,10 +40,13 @@ public class SaleMapper {
             customer.setId(customerId);
             sale.setCustomer(customer);
             
+            
             Driver driver = new Driver();
             driver.setId(driverId);
             sale.setDriver(driver);
             
+            //sale details data
+            sale.setSaleDetails(saleDetailData);
             sales.add(sale);
         }
         

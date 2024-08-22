@@ -20,4 +20,14 @@ public class SalesBulkEntryDto {
     private Long route;
     private Long driver;
     private List<Map<String, Object>> salesDetails;
+    
+    private Integer totalBirds;
+    private Integer mortality;
+    private Integer returnToFarm;
+    private String description;
+    private Integer totalBirdSale;
+    private Integer totalKilogramSale;
+    private Integer totalAmount;
+    private Integer totalPaymentReceived;
+    private Integer totalPending;
 }

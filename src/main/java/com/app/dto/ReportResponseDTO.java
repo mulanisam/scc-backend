@@ -1,7 +1,7 @@
 package com.app.dto;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import lombok.Data;
 
@@ -9,5 +9,5 @@ import lombok.Data;
 public class ReportResponseDTO {
 
 	private String errorMessage;
-    private List<Map<String, Object>> data;
+    private List<LinkedHashMap<String, Object>> data;
 }

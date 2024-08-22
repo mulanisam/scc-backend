@@ -13,13 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.app.dto.SaleMapper;
 import com.app.dto.SalesBulkEntryDto;
+import com.app.entity.Driver;
+import com.app.entity.Route;
 import com.app.entity.Sale;
 import com.app.entity.SaleDetails;
+import com.app.entity.Vehicle;
 import com.app.repository.CustomerRepository;
 import com.app.repository.SaleDetailsRepository;
 import com.app.repository.SaleRepository;
-
-import cutsomException.ResourceNotFoundException;
 
 @Service
 public class SalesServiceImpl implements SalesService {
@@ -40,16 +41,47 @@ public class SalesServiceImpl implements SalesService {
     public List<Sale> salesBulkEntry(SalesBulkEntryDto salesBulkEntryDto) {
         logger.info("Entering salesBulkEntry method with parameters: {}", salesBulkEntryDto);
         try {
+        	// Create or retrieve SaleDetails
+            SaleDetails saleDetails = new SaleDetails();
+            saleDetails.setDate(salesBulkEntryDto.getDate());
+            
+            Vehicle vehicle= new Vehicle();
+            vehicle.setId(salesBulkEntryDto.getVehicleNo());
+            saleDetails.setVehicle(vehicle);
+            
+            Route route= new Route();
+            route.setId(salesBulkEntryDto.getRoute());
+            saleDetails.setRoute(route);
+            
+            Driver driver= new Driver();
+            driver.setId(salesBulkEntryDto.getDriver());
+            saleDetails.setDriver(driver);
+
+            saleDetails.setDescription(salesBulkEntryDto.getDescription());
+            saleDetails.setTotalBirds(salesBulkEntryDto.getTotalBirds());
+            saleDetails.setMortality(salesBulkEntryDto.getMortality());
+            saleDetails.setReturnToFarm(salesBulkEntryDto.getReturnToFarm());
+            saleDetails.setTotalBirdSale(salesBulkEntryDto.getTotalBirdSale());
+            saleDetails.setTotalPaymentReceived(salesBulkEntryDto.getTotalPaymentReceived());
+            saleDetails.setTotalAmount(salesBulkEntryDto.getTotalAmount());
+            saleDetails.setTotalKilogramSale(salesBulkEntryDto.getTotalKilogramSale());
+            saleDetails.setTotalPending(salesBulkEntryDto.getTotalPending());
+       
+            saleDetails = saleDetailsRepository.save(saleDetails);
+            
+            
             List<Sale> bulkSalesEntries = SaleMapper.mapToSales(
                     salesBulkEntryDto.getSalesDetails(),
                     salesBulkEntryDto.getDate(),
                     salesBulkEntryDto.getVehicleNo(),
                     salesBulkEntryDto.getRoute(),
-                    salesBulkEntryDto.getDriver()
+                    salesBulkEntryDto.getDriver(),saleDetails
             );
             List<Sale> savedSales = saleRepository.saveAll(bulkSalesEntries);
+            
+            
+            //To update Balance amount
              List<Map<String, Object>> salesDetails = salesBulkEntryDto.getSalesDetails();
-             
              salesDetails.forEach(map -> {
             	 Integer pending =  (Integer) map.get("pending");
             	 System.out.println("pending"+pending);
@@ -84,9 +116,18 @@ public class SalesServiceImpl implements SalesService {
 	@Override
 	public SaleDetails getSaleDetails(LocalDate date, String route, String vehicle, String driver) {
         logger.info("Fetching sale details for date: {}, route: {}, vehicle: {}, driver: {}", date, route, vehicle, driver);
-        Optional<SaleDetails> saleDetails = saleDetailsRepository.findByDateAndRouteAndVehicleAndDriver(date.toString(), route, vehicle, driver);
+        Vehicle vehicle1= new Vehicle();
+        vehicle1.setId(Long.parseLong(vehicle));
+
+        Route route1= new Route();
+        route1.setId(Long.parseLong(route));
+        
+        Driver driver1= new Driver();
+        driver1.setId(Long.parseLong(driver));
+
+        Optional<SaleDetails> saleDetails = saleDetailsRepository.findByDateAndRouteAndVehicleAndDriver(date, route1, vehicle1, driver1);
         if (saleDetails.isPresent()) {
-            logger.info("Sale details found: {}", saleDetails.get());
+            logger.info("Sale details found: {}");
             return saleDetails.get();
         } else {
             logger.warn("No sale details found for the given criteria");

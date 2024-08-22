@@ -10,4 +10,5 @@ public class ReportRequestDTO {
     private String subType;
     private LocalDate startDate;
     private LocalDate endDate;
+    private String subTypeId;
 }
