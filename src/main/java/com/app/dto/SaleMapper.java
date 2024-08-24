@@ -24,6 +24,7 @@ public class SaleMapper {
             sale.setRate(Double.parseDouble((String)  salesDetail.get("rate")));
             sale.setAmount((Integer) salesDetail.get("amount"));
             sale.setDescription((String) salesDetail.get("description"));
+            
             String payment = (String )salesDetail.get("payment");
             sale.setPayment(Integer.parseInt(payment));
             sale.setPending((Integer) salesDetail.get("pending"));

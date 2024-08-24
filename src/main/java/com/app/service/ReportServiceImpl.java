@@ -45,8 +45,22 @@ public class ReportServiceImpl implements ReportService {
         List<String> columnOrder= new ArrayList<>();
 
         switch (request.getSubType()) {
-            case "routes":
-                //sales = saleRepository.findByRouteAndDateBetween(((Object) request).getRouteId(), request.getStartDate(), request.getEndDate());
+            case "routes":    
+                 if (request.getSubTypeId().isEmpty()) {
+ 				    rawSalesData = saleRepository.findByAllRouteAndDateBetween(request.getStartDate(), request.getEndDate());
+ 				   columnOrder = Arrays.asList("ROUTE", "VEHICLE", "DRIVER", "CITY","CUSTOMER NAME", 
+				            "SHOP NAME", "SALE DATE", "BIRDS", "WEIGHT", 
+				            "RATE", "AMOUNT", "PAYMENT RECEIVED", 
+				            "PAYMENT PENDING", "TOTAL BALANCE", "DESCRIPTION");
+ 				} else {
+ 					 
+ 				    rawSalesData = saleRepository.findByRouteAndDateBetween(Long.parseLong(request.getSubTypeId()), request.getStartDate(), request.getEndDate());
+ 				    columnOrder = Arrays.asList("ROUTE", "VEHICLE", "DRIVER","CITY", "CUSTOMER NAME", 
+ 				            "SHOP NAME", "SALE DATE", "BIRDS", "WEIGHT", 
+ 				            "RATE", "AMOUNT", "PAYMENT RECEIVED", 
+ 				            "PAYMENT PENDING", "TOTAL BALANCE", "DESCRIPTION");
+ 				}
+
                 break;
 			case "customers":
 	

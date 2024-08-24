@@ -67,7 +67,7 @@ public class SalesServiceImpl implements SalesService {
             saleDetails.setTotalKilogramSale(salesBulkEntryDto.getTotalKilogramSale());
             saleDetails.setTotalPending(salesBulkEntryDto.getTotalPending());
        
-            saleDetails = saleDetailsRepository.save(saleDetails);
+            saleDetails = saveSaleDetails(saleDetails);
             
             
             List<Sale> bulkSalesEntries = SaleMapper.mapToSales(
@@ -106,7 +106,26 @@ public class SalesServiceImpl implements SalesService {
 	public SaleDetails saveSaleDetails(SaleDetails saleDetails) {
 		logger.info("Entering saveSaleDetails method with parameters: {}", saleDetails);
 		 try {
-	            return saleDetailsRepository.save(saleDetails);
+
+			 Optional<SaleDetails> existingSaleDetails = saleDetailsRepository.findByDateAndRouteAndVehicleAndDriver(saleDetails.getDate(), saleDetails.getRoute(), saleDetails.getVehicle(), saleDetails.getDriver());
+		        if (existingSaleDetails.isPresent()) {
+		            logger.info("Sale details found: {}",existingSaleDetails.get());
+		            existingSaleDetails.get().setTotalAmount(existingSaleDetails.get().getTotalAmount()+saleDetails.getTotalAmount());
+		            existingSaleDetails.get().setTotalBirdSale(existingSaleDetails.get().getTotalBirdSale()+saleDetails.getTotalBirdSale());
+		            existingSaleDetails.get().setTotalKilogramSale(existingSaleDetails.get().getTotalKilogramSale()+saleDetails.getTotalKilogramSale());
+		            existingSaleDetails.get().setTotalPaymentReceived(existingSaleDetails.get().getTotalPaymentReceived()+saleDetails.getTotalPaymentReceived());
+		            existingSaleDetails.get().setTotalPending(existingSaleDetails.get().getTotalPending()+saleDetails.getTotalPending());
+		            existingSaleDetails.get().setTotalAmount(existingSaleDetails.get().getTotalAmount()+saleDetails.getTotalAmount());
+		            logger.info("Saving Updated Sale details : {}",existingSaleDetails);
+		            return saleDetailsRepository.save(existingSaleDetails.get());
+		            
+		        } else {
+		            logger.warn("No sale details found for the given criteria so saving new saleDetails: {}",saleDetails);
+		            return saleDetailsRepository.save(saleDetails);
+		           
+		        }
+			 
+	            
 	        } catch (Exception e) {
 	            logger.error("Error saving sale details", e);
 	            throw new RuntimeException("Error saving sale details", e);
