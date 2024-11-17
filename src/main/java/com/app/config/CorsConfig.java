@@ -22,7 +22,7 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         .allowedOrigins("http://localhost:3000") // Restrict to trusted domains
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
-                        .allowedHeaders("Authorization", "Content-Type")
+                        .allowedHeaders("*")
                         .exposedHeaders("Authorization")
                         .allowCredentials(true); // Allow cookies
                 logger.info("CORS configuration applied");
