@@ -84,7 +84,7 @@ public class SalesServiceImpl implements SalesService {
              List<Map<String, Object>> salesDetails = salesBulkEntryDto.getSalesDetails();
              salesDetails.forEach(map -> {
             	 Integer pending =  (Integer) map.get("pending");
-            	 System.out.println("pending"+pending);
+            	// System.out.println("pending"+pending);
             	 if(pending!=null)
             	 {
             		 Integer custIdInt = (Integer) map.get("customerId");
