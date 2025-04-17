@@ -20,11 +20,13 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000") // Restrict to trusted domains
-                        .allowedMethods("GET", "POST", "PUT", "DELETE")
-                        .allowedHeaders("*")
-                        .exposedHeaders("Authorization")
-                        .allowCredentials(true); // Allow cookies
+                        .allowedOrigins(
+                            "*"
+                        ) // Restrict to trusted domains
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH") // Include OPTIONS and PATCH if needed
+                        .allowedHeaders("*") // Restrict headers if possible
+                        .exposedHeaders("*") // Expose additional headers if needed
+                        .allowCredentials(false); // Allow cookies
                 logger.info("CORS configuration applied");
             }
         };

@@ -66,14 +66,14 @@ public class ReportServiceImpl implements ReportService {
 	
 				if (request.getSubTypeId().isEmpty()) {
 				    rawSalesData = saleRepository.findSaleReportByDateRange(request.getStartDate(), request.getEndDate());
-				    columnOrder = Arrays.asList("ROUTE","CITY", "CUSTOMER NAME", "SHOP NAME", "TOTAL BALANCE");
+				    columnOrder = Arrays.asList("ROUTE","CITY", "CUSTOMER NAME", "SHOP NAME", "BALANCE PENDING");
 				} else {
 				    rawSalesData = saleRepository.findSaleReportByIdAndDateRange(Long.parseLong(request.getSubTypeId()),
 				            request.getStartDate(), request.getEndDate());
 				    columnOrder = Arrays.asList("ROUTE", "VEHICLE", "DRIVER", "CUSTOMER NAME", 
 				            "SHOP NAME", "SALE DATE", "BIRDS", "WEIGHT", 
 				            "RATE", "AMOUNT", "PAYMENT RECEIVED", 
-				            "PAYMENT PENDING", "TOTAL BALANCE", "DESCRIPTION");
+				            "PAYMENT PENDING", "BALANCE PENDING", "DESCRIPTION");
 				}
 
 				break;

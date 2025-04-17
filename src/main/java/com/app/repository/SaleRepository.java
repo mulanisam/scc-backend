@@ -32,7 +32,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long>{
                 "c.name AS 'CUSTOMER NAME', c.shop_name AS 'SHOP NAME', s.date AS 'SALE DATE', " +
                 "s.birds AS BIRDS, s.kilograms AS 'WEIGHT', s.rate AS RATE, s.amount AS 'AMOUNT', " +
                 "s.payment AS 'PAYMENT RECEIVED', s.pending AS 'PAYMENT PENDING', " +
-                "c.balance_amount AS 'TOTAL BALANCE', s.description AS 'DESCRIPTION' " +
+                "s.balance_pending AS 'BALANCE PENDING', s.description AS 'DESCRIPTION' " +
                 "FROM poultry_db.sale s " +
                 "INNER JOIN vehicle v ON s.vehicle_no = v.id " +
                 "INNER JOIN driver d ON s.driver_id = d.id " +
@@ -75,6 +75,8 @@ public interface SaleRepository extends JpaRepository<Sale, Long>{
         nativeQuery = true)
 		List<Map<String, Object>> findByAllRouteAndDateBetween(@Param("startDate") LocalDate startDate, 
 	                                                         @Param("endDate") LocalDate endDate);
+	
+		Sale findTopByCustomerIdOrderByIdDesc(Long id);
 	    
 	    
 	    

@@ -77,6 +77,16 @@ public class SalesServiceImpl implements SalesService {
                     salesBulkEntryDto.getRoute(),
                     salesBulkEntryDto.getDriver(),saleDetails
             );
+            for (Sale sale : bulkSalesEntries) {
+				Sale tempSale = saleRepository.findTopByCustomerIdOrderByIdDesc((Long)sale.getCustomer().getId());
+				Integer tempBalPending;
+				if(tempSale!=null)
+					tempBalPending= tempSale.getBalancePending() == null ? 0 :tempSale.getBalancePending();
+				else
+					tempBalPending=0;
+				Integer balPending= sale.getPending() == null ? 0 :sale.getPending();
+				sale.setBalancePending(tempBalPending+balPending);
+			}
             List<Sale> savedSales = saleRepository.saveAll(bulkSalesEntries);
             
             

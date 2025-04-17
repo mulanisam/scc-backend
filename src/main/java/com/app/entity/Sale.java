@@ -30,6 +30,7 @@ public class Sale {
     private Integer amount;
     private Integer payment;
     private Integer pending;
+    private Integer balancePending;
     private String paymentMode;
     private String description;
     private boolean obsolete;

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +31,7 @@ public class UserManagementController {
         logger.info("Register request received for username: {}", reg.getUsername());
         return ResponseEntity.ok(usersManagementService.register(reg));
     }
-
+    @CrossOrigin(origins = "http://sohel-chicken-center.s3-website.eu-north-1.amazonaws.com")
     @PostMapping("/auth/login")
     public ResponseEntity<ReqRes> login(@RequestBody ReqRes req) {
         logger.info("Login request received for username: {}", req.getUsername());
