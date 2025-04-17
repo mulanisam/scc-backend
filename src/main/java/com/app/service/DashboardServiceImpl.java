@@ -17,7 +17,7 @@ public class DashboardServiceImpl implements DashboardService {
 	public Dashboard getDashboardData() {
 		Dashboard dashboard = new Dashboard();
 		 
-		 LocalDate today = LocalDate.of(2025, 4, 15);//LocalDate.now();
+		 LocalDate today = LocalDate.now();
 		 DashboardSummaryDTO summary = saleDetailsRepository.getSaleDetailsSummaryByDate(today);
 		 dashboard.setTodaysSaleAmount(summary.getTotalAmount());
 		 dashboard.setReturnToFarmBirds(summary.getReturnToFarm());
