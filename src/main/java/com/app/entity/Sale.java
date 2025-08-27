@@ -34,6 +34,7 @@ public class Sale {
     private String paymentMode;
     private String description;
     private boolean obsolete;
+    private boolean smsSent = false;
    
     @ManyToOne
     @JoinColumn(name = "route_id", nullable = false)

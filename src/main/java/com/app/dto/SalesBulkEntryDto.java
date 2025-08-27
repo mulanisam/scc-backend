@@ -30,4 +30,6 @@ public class SalesBulkEntryDto {
     private Integer totalAmount;
     private Integer totalPaymentReceived;
     private Integer totalPending;
+    private boolean sendSms;
+    
 }

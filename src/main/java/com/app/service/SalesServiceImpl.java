@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.app.dto.SaleMapper;
 import com.app.dto.SalesBulkEntryDto;
+import com.app.entity.Customer;
 import com.app.entity.Driver;
 import com.app.entity.Route;
 import com.app.entity.Sale;
@@ -21,6 +22,10 @@ import com.app.entity.Vehicle;
 import com.app.repository.CustomerRepository;
 import com.app.repository.SaleDetailsRepository;
 import com.app.repository.SaleRepository;
+import com.app.utility.SmsMessageBuilder;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @Service
 public class SalesServiceImpl implements SalesService {
@@ -35,6 +40,13 @@ public class SalesServiceImpl implements SalesService {
     
     @Autowired
     private SaleDetailsRepository saleDetailsRepository;
+    
+    @Autowired
+    private SendSmsService sendSmsService;
+    
+    @PersistenceContext
+    private EntityManager entityManager;
+
 
     @Transactional
     @Override
@@ -87,7 +99,7 @@ public class SalesServiceImpl implements SalesService {
 				Integer balPending= sale.getPending() == null ? 0 :sale.getPending();
 				sale.setBalancePending(tempBalPending+balPending);
 			}
-            List<Sale> savedSales = saleRepository.saveAll(bulkSalesEntries);
+           List<Sale> savedSales = saleRepository.saveAll(bulkSalesEntries);
             
             
             //To update Balance amount
@@ -102,8 +114,32 @@ public class SalesServiceImpl implements SalesService {
             		 logger.info("Balance amount updated for customer Id : {} ", custIdInt);
             	 }
              });
-             
- 
+             entityManager.clear(); // Add this line to synchronize
+
+             if(salesBulkEntryDto.isSendSms()) {
+             for (Sale sale : savedSales) {
+                try {
+                	Optional<Customer> customer = customerRepository.findById(sale.getCustomer().getId());
+                     String customerName = customer.get().getName();
+                     String phone = customer.get().getMobileNo();
+                     double amount = (int) customer.get().getBalanceAmount();
+                     String message = SmsMessageBuilder.buildMarathiSms(customerName, amount);
+
+                    // String message = String.format("Hello %s, your sale of ₹%.2f has been recorded. Thank you!", customerName, amount);
+
+                     if (phone != null && !phone.trim().isEmpty()) {
+                         sendSmsService.sendSms(customerName, phone,amount,salesBulkEntryDto.getDate());
+                        logger.info("📲 SMS trigger sent for customer {} ({})", customerName, phone);
+                         sale.setSmsSent(true);
+                     } else {
+                        logger.warn("⚠️ Customer {} has no phone number, SMS not sent.", customerName);
+                     }
+                 } catch (Exception ex) {
+                     logger.error("❌ Failed to trigger SMS for sale ID {}: {}", sale.getId(), ex.getMessage());
+               }
+             }
+             }
+             saleRepository.saveAll(savedSales);
             logger.info("Bulk sales entry created successfully with {} records", savedSales.size());
             return savedSales;
         } catch (Exception e) {
