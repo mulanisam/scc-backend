@@ -13,12 +13,16 @@ import com.app.dto.CustomerDTO;
 import com.app.entity.City;
 import com.app.entity.Customer;
 import com.app.entity.Driver;
+import com.app.entity.Party;
+import com.app.entity.PartyVehicle;
 import com.app.entity.Route;
 import com.app.entity.Supplier;
 import com.app.entity.Vehicle;
 import com.app.repository.CityRepository;
 import com.app.repository.CustomerRepository;
 import com.app.repository.DriverRepository;
+import com.app.repository.PartyRepository;
+import com.app.repository.PartyVehicleRepository;
 import com.app.repository.RouteRepository;
 import com.app.repository.SupplierRepository;
 import com.app.repository.VehicleRepository;
@@ -44,6 +48,10 @@ public class MasterDataServiceImpl implements MasterDataService {
     private CityRepository cityRepository;
     @Autowired
     private VehicleRepository vehicleRepository;
+    @Autowired
+    private PartyRepository partyRepository;
+    @Autowired
+    private PartyVehicleRepository partyVehicleRepository;
 
     @Override
     public List<Customer> getAllCustomers() {
@@ -385,6 +393,122 @@ public class MasterDataServiceImpl implements MasterDataService {
         logger.info("Retrieved {} customers", suppliers.size());
         logger.info("Exiting getAllCustomers method");
         return suppliers;
+	}
+
+	// Party methods
+
+	@Override
+	public List<Party> getAllParties() {
+	    logger.info("Entering getAllParties method");
+	    List<Party> parties = partyRepository.findAll();
+	    logger.info("Retrieved {} parties", parties.size());
+	    logger.info("Exiting getAllParties method");
+	    return parties;
+	}
+
+	@Override
+	public Party createParty(Party party) {
+	    logger.info("Entering createParty method with Party: {}", party);
+	    Party savedParty = partyRepository.save(party);
+	    logger.info("Created party with ID: {}", savedParty.getId());
+	    logger.info("Exiting createParty method");
+	    return savedParty;
+	}
+
+	@Override
+	public Party getPartyById(Long id) {
+	    logger.info("Entering getPartyById method with ID: {}", id);
+	    Party party = partyRepository.findById(id)
+	        .orElseThrow(() -> new ResourceNotFoundException("Party not found with id " + id));
+	    logger.info("Retrieved party: {}", party);
+	    logger.info("Exiting getPartyById method");
+	    return party;
+	}
+
+	@Override
+	public Party updateParty(Long id, Party partyDetails) {
+	    logger.info("Entering updateParty method with ID: {} and Party details: {}", id, partyDetails);
+	    Party party = getPartyById(id);
+	    party.setName(partyDetails.getName());
+	    party.setAddress(partyDetails.getAddress());
+	    party.setIsObsolete(partyDetails.getIsObsolete());
+	    // Update other fields as necessary
+	    Party updatedParty = partyRepository.save(party);
+	    logger.info("Updated party with ID: {}", updatedParty.getId());
+	    logger.info("Exiting updateParty method");
+	    return updatedParty;
+	}
+
+	@Override
+	public void deleteParty(Long id) {
+	    logger.info("Entering deleteParty method with ID: {}", id);
+	    Party party = getPartyById(id);
+	    partyRepository.delete(party);
+	    logger.info("Deleted party with ID: {}", id);
+	    logger.info("Exiting deleteParty method");
+	}
+
+	// PartyVehicle methods
+
+	@Override
+	public List<PartyVehicle> getAllPartyVehicles() {
+	    logger.info("Entering getAllPartyVehicles method");
+	    List<PartyVehicle> partyVehicles = partyVehicleRepository.findAll();
+	    logger.info("Retrieved {} party vehicles", partyVehicles.size());
+	    logger.info("Exiting getAllPartyVehicles method");
+	    return partyVehicles;
+	}
+
+	@Override
+	public PartyVehicle createPartyVehicle(PartyVehicle partyVehicle) {
+	    logger.info("Entering createPartyVehicle method with PartyVehicle: {}", partyVehicle);
+	    PartyVehicle savedPartyVehicle = partyVehicleRepository.save(partyVehicle);
+	    logger.info("Created party vehicle with ID: {}", savedPartyVehicle.getId());
+	    logger.info("Exiting createPartyVehicle method");
+	    return savedPartyVehicle;
+	}
+
+	@Override
+	public PartyVehicle getPartyVehicleById(Long id) {
+	    logger.info("Entering getPartyVehicleById method with ID: {}", id);
+	    PartyVehicle partyVehicle = partyVehicleRepository.findById(id)
+	        .orElseThrow(() -> new ResourceNotFoundException("PartyVehicle not found with id " + id));
+	    logger.info("Retrieved party vehicle: {}", partyVehicle);
+	    logger.info("Exiting getPartyVehicleById method");
+	    return partyVehicle;
+	}
+
+	@Override
+	public PartyVehicle updatePartyVehicle(Long id, PartyVehicle partyVehicleDetails) {
+	    logger.info("Entering updatePartyVehicle method with ID: {} and PartyVehicle details: {}", id, partyVehicleDetails);
+	    PartyVehicle partyVehicle = getPartyVehicleById(id);
+	    partyVehicle.setVehicleNumber(partyVehicleDetails.getVehicleNumber());
+	    //partyVehicle.setDescription(partyVehicleDetails.getDescription());
+	    partyVehicle.setIsObsolete(partyVehicleDetails.getIsObsolete());
+	    // Update other fields as necessary
+	    PartyVehicle updatedPartyVehicle = partyVehicleRepository.save(partyVehicle);
+	    logger.info("Updated party vehicle with ID: {}", updatedPartyVehicle.getId());
+	    logger.info("Exiting updatePartyVehicle method");
+	    return updatedPartyVehicle;
+	}
+
+	@Override
+	public void deletePartyVehicle(Long id) {
+	    logger.info("Entering deletePartyVehicle method with ID: {}", id);
+	    PartyVehicle partyVehicle = getPartyVehicleById(id);
+	    partyVehicleRepository.delete(partyVehicle);
+	    logger.info("Deleted party vehicle with ID: {}", id);
+	    logger.info("Exiting deletePartyVehicle method");
+	}
+
+	@Override
+	public List<PartyVehicle> getPartyVehicleByPartyId(Long id) {
+		logger.info("Entering getPartyVehicleByPartyId method with ID: {}", id);
+		List<PartyVehicle> partyVehicle = partyVehicleRepository.findByPartyId(id)
+	        .orElseThrow(() -> new ResourceNotFoundException("PartyVehicle not found with party id " + id));
+	    logger.info("Retrieved party vehicle: {}", partyVehicle);
+	    logger.info("Exiting getPartyVehicleByPartyId method");
+	    return partyVehicle;
 	}
 
 }

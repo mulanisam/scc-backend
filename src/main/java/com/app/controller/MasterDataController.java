@@ -21,6 +21,8 @@ import com.app.dto.CustomerDTO;
 import com.app.entity.City;
 import com.app.entity.Customer;
 import com.app.entity.Driver;
+import com.app.entity.Party;
+import com.app.entity.PartyVehicle;
 import com.app.entity.Route;
 import com.app.entity.Supplier;
 import com.app.entity.Vehicle;
@@ -313,5 +315,105 @@ public class MasterDataController {
         logger.info("Exiting deleteVehicle endpoint");
         return ResponseEntity.noContent().build();
     }
+ // Party endpoints
 
+    @GetMapping("/parties")
+    public ResponseEntity<List<Party>> getAllParties() {
+        logger.info("Entering getAllParties endpoint");
+        List<Party> parties = masterDataService.getAllParties();
+        logger.info("Returning {} parties", parties.size());
+        logger.info("Exiting getAllParties endpoint");
+        return ResponseEntity.ok(parties);
+    }
+
+    @PostMapping("/parties")
+    public ResponseEntity<Party> createParty(@RequestBody Party party) {
+        logger.info("Entering createParty endpoint with Party: {}", party);
+        Party createdParty = masterDataService.createParty(party);
+        logger.info("Created party with ID: {}", createdParty.getId());
+        logger.info("Exiting createParty endpoint");
+        return new ResponseEntity<>(createdParty, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/parties/{id}")
+    public ResponseEntity<Party> getPartyById(@PathVariable Long id) {
+        logger.info("Entering getPartyById endpoint with ID: {}", id);
+        Party party = masterDataService.getPartyById(id);
+        logger.info("Returning party with ID: {}", id);
+        logger.info("Exiting getPartyById endpoint");
+        return ResponseEntity.ok(party);
+    }
+
+    @PutMapping("/parties/{id}")
+    public ResponseEntity<Party> updateParty(@PathVariable Long id, @RequestBody Party party) {
+        logger.info("Entering updateParty endpoint with ID: {} and Party: {}", id, party);
+        Party updatedParty = masterDataService.updateParty(id, party);
+        logger.info("Updated party with ID: {}", updatedParty.getId());
+        logger.info("Exiting updateParty endpoint");
+        return ResponseEntity.ok(updatedParty);
+    }
+
+    @DeleteMapping("/parties/{id}")
+    public ResponseEntity<Void> deleteParty(@PathVariable Long id) {
+        logger.info("Entering deleteParty endpoint with ID: {}", id);
+        masterDataService.deleteParty(id);
+        logger.info("Deleted party with ID: {}", id);
+        logger.info("Exiting deleteParty endpoint");
+        return ResponseEntity.noContent().build();
+    }
+
+    // PartyVehicle endpoints
+
+    @GetMapping("/partyVehicles")
+    public ResponseEntity<List<PartyVehicle>> getAllPartyVehicles() {
+        logger.info("Entering getAllPartyVehicles endpoint");
+        List<PartyVehicle> partyVehicles = masterDataService.getAllPartyVehicles();
+        logger.info("Returning {} party vehicles", partyVehicles.size());
+        logger.info("Exiting getAllPartyVehicles endpoint");
+        return ResponseEntity.ok(partyVehicles);
+    }
+
+    @PostMapping("/partyVehicles")
+    public ResponseEntity<PartyVehicle> createPartyVehicle(@RequestBody PartyVehicle partyVehicle) {
+        logger.info("Entering createPartyVehicle endpoint with PartyVehicle: {}", partyVehicle);
+        PartyVehicle createdPartyVehicle = masterDataService.createPartyVehicle(partyVehicle);
+        logger.info("Created party vehicle with ID: {}", createdPartyVehicle.getId());
+        logger.info("Exiting createPartyVehicle endpoint");
+        return new ResponseEntity<>(createdPartyVehicle, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/partyVehicles/{id}")
+    public ResponseEntity<PartyVehicle> getPartyVehicleById(@PathVariable Long id) {
+        logger.info("Entering getPartyVehicleById endpoint with ID: {}", id);
+        PartyVehicle partyVehicle = masterDataService.getPartyVehicleById(id);
+        logger.info("Returning party vehicle with ID: {}", id);
+        logger.info("Exiting getPartyVehicleById endpoint");
+        return ResponseEntity.ok(partyVehicle);
+    }
+
+    @PutMapping("/partyVehicles/{id}")
+    public ResponseEntity<PartyVehicle> updatePartyVehicle(@PathVariable Long id, @RequestBody PartyVehicle partyVehicle) {
+        logger.info("Entering updatePartyVehicle endpoint with ID: {} and PartyVehicle: {}", id, partyVehicle);
+        PartyVehicle updatedPartyVehicle = masterDataService.updatePartyVehicle(id, partyVehicle);
+        logger.info("Updated party vehicle with ID: {}", updatedPartyVehicle.getId());
+        logger.info("Exiting updatePartyVehicle endpoint");
+        return ResponseEntity.ok(updatedPartyVehicle);
+    }
+
+    @DeleteMapping("/partyVehicles/{id}")
+    public ResponseEntity<Void> deletePartyVehicle(@PathVariable Long id) {
+        logger.info("Entering deletePartyVehicle endpoint with ID: {}", id);
+        masterDataService.deletePartyVehicle(id);
+        logger.info("Deleted party vehicle with ID: {}", id);
+        logger.info("Exiting deletePartyVehicle endpoint");
+        return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/partyVehicles/party/{id}")
+    public ResponseEntity<List<PartyVehicle>> getPartyVehicleByPartyId(@PathVariable Long id) {
+        logger.info("Entering getPartyVehicleByPartyId endpoint with ID: {}", id);
+        List<PartyVehicle> partyVehicle = masterDataService.getPartyVehicleByPartyId(id);
+        logger.info("Returning party vehicle with Party ID: {}", id);
+        logger.info("Exiting getPartyVehicleByPartyId endpoint");
+        return ResponseEntity.ok(partyVehicle);
+    }
 }
