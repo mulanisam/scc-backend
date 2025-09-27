@@ -2,6 +2,7 @@ package com.app.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,9 +26,17 @@ public class TradingController {
 
     private static final Logger logger = LoggerFactory.getLogger(TradingController.class);
 
-    private final TradingService tradingService;
+    @Autowired
+    private  TradingService tradingService;
 
-    @PostMapping
+    
+    
+//    public TradingController(TradingService tradingService) {
+//		super();
+//		this.tradingService = tradingService;
+//	}
+
+	@PostMapping
     public ResponseEntity<TradingEntry> createTradingEntry( @RequestBody TradingEntryDto dto) {
         logger.info("Request to create trading entry: {}", dto);
         TradingEntry createdEntry = tradingService.createTradingEntry(dto);

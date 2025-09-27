@@ -28,7 +28,18 @@ public class TradingServiceImpl implements TradingService {
     private final SupplierRepository supplierRepository;
     private final PartyVehicleRepository partyVehicleRepository;
 
-    @Override
+    
+    
+//    public TradingServiceImpl(TradingEntryRepository tradingEntryRepository, PartyRepository partyRepository,
+//			SupplierRepository supplierRepository, PartyVehicleRepository partyVehicleRepository) {
+//		super();
+//		this.tradingEntryRepository = tradingEntryRepository;
+//		this.partyRepository = partyRepository;
+//		this.supplierRepository = supplierRepository;
+//		this.partyVehicleRepository = partyVehicleRepository;
+//	}
+
+	@Override
     @Transactional
     public TradingEntry createTradingEntry(TradingEntryDto dto) {
         logger.info("Creating trading entry with data: {}", dto);
