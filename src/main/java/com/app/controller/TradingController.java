@@ -26,8 +26,15 @@ public class TradingController {
     private static final Logger logger = LoggerFactory.getLogger(TradingController.class);
 
     private final TradingService tradingService;
+    
+    
 
-    @PostMapping
+    public TradingController(TradingService tradingService) {
+		super();
+		this.tradingService = tradingService;
+	}
+
+	@PostMapping
     public ResponseEntity<TradingEntry> createTradingEntry( @RequestBody TradingEntryDto dto) {
         logger.info("Request to create trading entry: {}", dto);
         TradingEntry createdEntry = tradingService.createTradingEntry(dto);

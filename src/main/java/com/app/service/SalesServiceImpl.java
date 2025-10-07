@@ -8,6 +8,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +48,8 @@ public class SalesServiceImpl implements SalesService {
     
     @PersistenceContext
     private EntityManager entityManager;
-
+    @Autowired
+    private Environment env;
 
     @Transactional
     @Override
@@ -115,7 +118,8 @@ public class SalesServiceImpl implements SalesService {
             	 }
              });
              entityManager.clear(); // Add this line to synchronize
-
+             boolean value = env.acceptsProfiles(Profiles.of("dev", "test")) ? false : true;
+             salesBulkEntryDto.setSendSms(value);
              if(salesBulkEntryDto.isSendSms()) {
              for (Sale sale : savedSales) {
                 try {
