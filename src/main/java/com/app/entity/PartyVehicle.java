@@ -1,6 +1,5 @@
 package com.app.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -15,6 +14,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "party_vehicles")
@@ -33,6 +33,7 @@ public class PartyVehicle {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "party_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @ToString.Exclude 
     private Party party;
 
     @Column(name = "is_obsolete")

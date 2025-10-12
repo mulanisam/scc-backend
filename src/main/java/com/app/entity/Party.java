@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "parties")
@@ -48,5 +49,6 @@ public class Party {
     // Assuming vehicles relationship: one party can have many vehicles
     @OneToMany(mappedBy = "party", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnoreProperties("party")
+    @ToString.Exclude 
     private java.util.List<PartyVehicle> partyVehicles;
 }

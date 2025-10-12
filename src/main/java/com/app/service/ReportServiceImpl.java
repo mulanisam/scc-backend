@@ -15,6 +15,7 @@ import com.app.dto.ReportRequestDTO;
 import com.app.dto.ReportResponseDTO;
 import com.app.repository.PurchaseRepository;
 import com.app.repository.SaleRepository;
+import com.app.repository.TradingRepository;
 @Service
 public class ReportServiceImpl implements ReportService {
 
@@ -25,6 +26,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private PurchaseRepository purchaseRepository;
+    
+    @Autowired
+    private TradingRepository tradingRepository;
 
     @Override
     public ReportResponseDTO generateReport(ReportRequestDTO request) {
@@ -37,6 +41,8 @@ public class ReportServiceImpl implements ReportService {
                 reportData = generateSalesReport(request);
             } else if ("purchase".equalsIgnoreCase(request.getReportType())) {
                 reportData = generatePurchaseReport(request);
+            } else if ("trading".equalsIgnoreCase(request.getReportType())) {
+                reportData = generateTradingReport(request);
             } else {
                 throw new IllegalArgumentException("Invalid report type: " + request.getReportType());
             }
@@ -95,6 +101,8 @@ public class ReportServiceImpl implements ReportService {
                 logger.warn("Unsupported sales report subtype: {}", request.getSubType());
                 break;
         }
+        
+        
 
         // Process data to maintain column order
         for (Map<String, Object> row : rawSalesData) {
@@ -108,6 +116,72 @@ public class ReportServiceImpl implements ReportService {
         return sales;
     }
 
+    private List<LinkedHashMap<String, Object>> generateTradingReport(ReportRequestDTO request) {
+        logger.info("Generating trading report with subType: {}, subTypeId: {}", 
+                   request.getSubType(), request.getSubTypeId());
+        
+        List<LinkedHashMap<String, Object>> tradingData = new ArrayList<>();
+        List<Map<String, Object>> rawTradingData = new ArrayList<>();
+        List<String> columnOrder = new ArrayList<>();
+
+        try {
+            switch (request.getSubType().toLowerCase()) {
+                case "party":
+                    if (request.getSubTypeId() != null && !request.getSubTypeId().isEmpty()) {
+                        rawTradingData = tradingRepository.findTradingReportByPartyAndDateRange(
+                                Long.parseLong(request.getSubTypeId()),
+                                request.getStartDate(), request.getEndDate());
+                        columnOrder = Arrays.asList(
+                                "PARTY_NAME", "ENTRY_DATE", "ENTRY_TYPE", "SUPPLIER_NAME", 
+                                "VEHICLE_NUMBER", "BIRDS", "WEIGHT_KG", "RATE_PER_KG", 
+                                "SALE_AMOUNT", "PAYMENT_RECEIVED", "OPENING_BALANCE", 
+                                "CLOSING_BALANCE", "TRANSACTION_ID", "DESCRIPTION"
+                        );
+                    } else {
+                        throw new IllegalArgumentException("Party ID is required for party-wise trading report");
+                    }
+                    break;
+
+                case "all":
+                    rawTradingData = tradingRepository.findAllPartyTradingSummaryByDateRange(
+                            request.getStartDate(), request.getEndDate());
+                    columnOrder = Arrays.asList(
+                            "PARTY_NAME", "TOTAL_SALES", "TOTAL_PAYMENTS", "TOTAL_BIRDS", 
+                            "TOTAL_WEIGHT", "AVERAGE_RATE", "CURRENT_BALANCE", "LAST_TRANSACTION_DATE",
+                            "TRANSACTION_COUNT", "OPENING_BALANCE_PERIOD", "CLOSING_BALANCE_PERIOD"
+                    );
+                    break;
+
+                default:
+                    logger.warn("Unsupported trading report subtype: {}", request.getSubType());
+                    throw new IllegalArgumentException("Unsupported trading report subtype: " + request.getSubType());
+            }
+
+            // Process data to maintain column order
+            for (Map<String, Object> row : rawTradingData) {
+                LinkedHashMap<String, Object> orderedRow = new LinkedHashMap<>();
+                for (String column : columnOrder) {
+                    Object value = row.get(column);
+                    orderedRow.put(column, value != null ? value : "");
+                }
+                tradingData.add(orderedRow);
+            }
+
+            logger.info("Generated {} trading report records", tradingData.size());
+
+        } catch (NumberFormatException e) {
+            logger.error("Invalid subTypeId format: {}", request.getSubTypeId(), e);
+            throw new IllegalArgumentException("Invalid Party ID format: " + request.getSubTypeId());
+        } catch (Exception e) {
+            logger.error("Error generating trading report", e);
+            throw new RuntimeException("Failed to generate trading report", e);
+        }
+
+        return tradingData;
+    }
+
+    
+    
     private List<LinkedHashMap<String, Object>> generatePurchaseReport(ReportRequestDTO request) {
         logger.info("Generating purchase report with subType: {}, subTypeId: {}", 
                    request.getSubType(), request.getSubTypeId());

@@ -11,26 +11,31 @@ import lombok.Data;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TradingEntryDto {
+public class PaymentEntryDto {
+
     private Long id;
+
+    //@NOt(message = "Date is required")
     private LocalDate date;
+
+   // @NotNull(message = "Party ID is required")
     private Long partyId;
-    private String partyName;
-    private Long supplierId;
-    private String supplierName;
-    private Long partyVehicleId;
-    private String vehicleNumber;
-    private Integer birds;
-    private Double kilograms;
-    private Double rate;
-    private Integer amount;
+
+    private String partyName; // For display purposes
+
+    //@NotNull(message = "Payment amount is required")
+    //@Positive(message = "Payment amount must be positive")
     private Integer payment;
-    private Integer pending;
+
+    private String transactionId;
+
     private String description;
+
     private Integer openingBalance;
+
     private Integer closingBalance;
+
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
 }
-
-
