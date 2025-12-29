@@ -8,6 +8,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
 @Service
+@Transactional
 public class SalesServiceImpl implements SalesService {
 
     private static final Logger logger = LoggerFactory.getLogger(SalesServiceImpl.class);
@@ -46,9 +49,10 @@ public class SalesServiceImpl implements SalesService {
     
     @PersistenceContext
     private EntityManager entityManager;
+    @Autowired
+    private Environment env;
 
-
-    @Transactional
+    
     @Override
     public List<Sale> salesBulkEntry(SalesBulkEntryDto salesBulkEntryDto) {
         logger.info("Entering salesBulkEntry method with parameters: {}", salesBulkEntryDto);
@@ -115,7 +119,8 @@ public class SalesServiceImpl implements SalesService {
             	 }
              });
              entityManager.clear(); // Add this line to synchronize
-
+             boolean value = env.acceptsProfiles(Profiles.of("dev", "test")) ? false : true;
+             salesBulkEntryDto.setSendSms(value);
              if(salesBulkEntryDto.isSendSms()) {
              for (Sale sale : savedSales) {
                 try {

@@ -33,4 +33,11 @@ public interface SaleDetailsRepository extends JpaRepository<SaleDetails, Long> 
     DashboardSummaryDTO getSaleDetailsSummaryByDate(@Param("date") LocalDate date);
 
 
+    @Query("SELECT NEW com.app.dto.DashboardSummaryDTO(" +
+    	       "SUM(sd.totalAmount), SUM(sd.totalPaymentReceived), SUM(sd.totalPending), " +
+    	       "SUM(sd.totalBirdSale), SUM(sd.totalKilogramSale), SUM(sd.mortality), SUM(sd.returnToFarm)) " +
+    	       "FROM SaleDetails sd WHERE DATE(sd.date) BETWEEN :startDate AND :endDate")
+    	DashboardSummaryDTO getSaleDetailsSummaryByDateRange(@Param("startDate") LocalDate startDate, 
+    	                                                     @Param("endDate") LocalDate endDate);
+
 }
