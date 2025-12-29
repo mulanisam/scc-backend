@@ -30,6 +30,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
 @Service
+@Transactional
 public class SalesServiceImpl implements SalesService {
 
     private static final Logger logger = LoggerFactory.getLogger(SalesServiceImpl.class);
@@ -51,7 +52,7 @@ public class SalesServiceImpl implements SalesService {
     @Autowired
     private Environment env;
 
-    @Transactional
+    
     @Override
     public List<Sale> salesBulkEntry(SalesBulkEntryDto salesBulkEntryDto) {
         logger.info("Entering salesBulkEntry method with parameters: {}", salesBulkEntryDto);
